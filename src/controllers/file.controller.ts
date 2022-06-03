@@ -6,8 +6,13 @@ import path from 'path'
 import MyFile , {IPhoto} from '../models/File';
 
 export async function getFiles(req: Request, res: Response): Promise<Response> {
-    const files = await MyFile.find();
-    return res.json(files);
+    try {
+        const files = await MyFile.find();
+        return res.json(files);
+    } catch (error) {
+        return res.json({ error: error})
+    }
+
 };
 
 
@@ -30,16 +35,28 @@ export async function createFile(req: Request, res: Response): Promise<Response>
 };
 
 export async function getFile(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
-    const file = await MyFile.findById(id);
-    return res.json(file);
+    
+    try {
+        const { id } = req.params;
+        const file = await MyFile.findById(id);
+        return res.json(file);  
+    } catch (error) {
+        return res.json({error:error})
+    }
+    
+
 }
 
 export async function deleteFile(req: Request, res: Response): Promise<Response> {
-    const { id } = req.params;
-    const file = await MyFile.findByIdAndRemove(id) as IPhoto;
-    if (file) {
-        await fs.unlink(path.resolve(file.imagePath));
+    try {
+        const { id } = req.params;
+        const file = await MyFile.findByIdAndRemove(id) as IPhoto;
+        if (file) {
+            await fs.unlink(path.resolve(file.imagePath));
+        }
+        return res.json({ message: 'File Deleted' });
+    } catch (error) {
+        return res.json({ error: error})
     }
-    return res.json({ message: 'File Deleted' });
+
 };
